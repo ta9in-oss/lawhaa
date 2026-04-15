@@ -42,6 +42,13 @@ import { LilitaFontFaces } from "./Lilita";
 import { NunitoFontFaces } from "./Nunito";
 import { VirgilFontFaces } from "./Virgil";
 import { XiaolaiFontFaces } from "./Xiaolai";
+// Arabic handwriting / display fonts
+import { IBMPlexSansArabicFontFaces } from "./IBMPlexSansArabic";
+import { LalezarFontFaces } from "./Lalezar";
+import { MarheyFontFaces } from "./Marhey";
+import { NotoSansArabicFontFaces } from "./NotoSansArabic";
+import { PlaypenSansArabicFontFaces } from "./PlaypenSansArabic";
+import { RakkasFontFaces } from "./Rakkas";
 
 export class Fonts {
   // it's ok to track fonts across multiple instances only once, so let's use
@@ -392,6 +399,14 @@ export class Fonts {
     init("Lilita One", ...LilitaFontFaces);
     init("Nunito", ...NunitoFontFaces);
     init("Virgil", ...VirgilFontFaces);
+
+    // Arabic handwriting / display fonts
+    init("Playpen Sans Arabic", ...PlaypenSansArabicFontFaces);
+    init("Noto Sans Arabic", ...NotoSansArabicFontFaces);
+    init("IBM Plex Sans Arabic", ...IBMPlexSansArabicFontFaces);
+    init("Lalezar", ...LalezarFontFaces);
+    init("Rakkas", ...RakkasFontFaces);
+    init("Marhey", ...MarheyFontFaces);
 
     // fallback font faces
     init(CJK_HAND_DRAWN_FALLBACK_FONT, ...XiaolaiFontFaces);

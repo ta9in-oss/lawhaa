@@ -1974,6 +1974,41 @@
   resolved "https://registry.yarnpkg.com/@floating-ui/utils/-/utils-0.2.9.tgz#50dea3616bc8191fb8e112283b49eaff03e78429"
   integrity sha512-MDWhGtE+eHw5JW7lq4qhc5yRLS11ERl1c7Z6Xd0a58DozHES6EnNNwUWbMiG4J9Cgj053Bhk8zvlhFYKVhULwg==
 
+"@fontsource/ibm-plex-sans-arabic@5.2.9":
+  version "5.2.9"
+  resolved "https://registry.yarnpkg.com/@fontsource/ibm-plex-sans-arabic/-/ibm-plex-sans-arabic-5.2.9.tgz#513892896d05b707dbae7af9807065350b17277f"
+  integrity sha512-mAs+anYcmatmhTuYApDy/CEEu5iYcfalXp2DB1gBN/6o2ex24lcBs635bwtgV5BNbByCYslIGsQvD4X6s7eVgw==
+
+"@fontsource/lalezar@5.2.7":
+  version "5.2.7"
+  resolved "https://registry.yarnpkg.com/@fontsource/lalezar/-/lalezar-5.2.7.tgz#fe8a40d4480474cea8eb7b14ad18282941a6e42e"
+  integrity sha512-S2rnPkZKVLKkyHhml4btt5MrXLH6ECgjUeVY/Zvg5cvAlmIhcQhYydoag651oO9xisD5FLolLqqVy46xav1/qQ==
+
+"@fontsource/marhey@5.2.8":
+  version "5.2.8"
+  resolved "https://registry.yarnpkg.com/@fontsource/marhey/-/marhey-5.2.8.tgz#ce26d3ca20a5be2ec4d140ec7b3eddcec8524aee"
+  integrity sha512-2xyabc2XpY40jhNFdxOsVpHlMLDJgB5TrOB+gRj0cClykBpuIm0hH9cfVESf++xTUBpoh/EV6qN9iyqiUYFe8w==
+
+"@fontsource/noto-sans-arabic@5.2.10":
+  version "5.2.10"
+  resolved "https://registry.yarnpkg.com/@fontsource/noto-sans-arabic/-/noto-sans-arabic-5.2.10.tgz#206b42f363bcfc728207483dfec81f86ef756a9b"
+  integrity sha512-Hgj3NwQJ0NquIADW3hFboFjsts4UvEOJQ8tOX0bhQZgpNKHsMawjv/1SZnq0QvRbP6efHTZM/A1k7tdy9S6sbA==
+
+"@fontsource/playpen-sans-arabic@5.2.4":
+  version "5.2.4"
+  resolved "https://registry.yarnpkg.com/@fontsource/playpen-sans-arabic/-/playpen-sans-arabic-5.2.4.tgz#7bf649f57993e5bbe6c7ebf2f5595462bc0be6bb"
+  integrity sha512-De0j5a6GnPxZkjGvSFtGmWHviITfPj1x2gTxAaYtzgHIOTRtSdbrX/liJvMkkyJaeyaYpUxwDFw3mc47qLTttg==
+
+"@fontsource/playpen-sans@5.2.8":
+  version "5.2.8"
+  resolved "https://registry.yarnpkg.com/@fontsource/playpen-sans/-/playpen-sans-5.2.8.tgz#f0baaea63e85fb376a1e458c84e0e8a9a1de7637"
+  integrity sha512-lT8GrhQunGZgTiGIBhFjQQ3kcWEPNDCUQQdXwOI236lw6CnQTVKo5xqxukPaxlGUgn21P59g6jrq6+AuQdqNIQ==
+
+"@fontsource/rakkas@5.2.8":
+  version "5.2.8"
+  resolved "https://registry.yarnpkg.com/@fontsource/rakkas/-/rakkas-5.2.8.tgz#d804061c63963aa2cd17d96aaa739fde55e749e5"
+  integrity sha512-pRHD45oXlCKpXN/a0duCGJOMxjokAUeGXP0l9k2WIxQ45bSdtaXNBAHQNd9lesPJ8glaVhEJu0rf1O/pOq8Vdg==
+
 "@grpc/grpc-js@~1.9.0":
   version "1.9.15"
   resolved "https://registry.yarnpkg.com/@grpc/grpc-js/-/grpc-js-1.9.15.tgz#433d7ac19b1754af690ea650ab72190bd700739b"

@@ -138,6 +138,13 @@ export const FONT_FAMILY = {
   "Comic Shanns": 8,
   "Liberation Sans": 9,
   Assistant: 10,
+  // Arabic handwriting / display fonts (IDs 11–16)
+  "Playpen Sans Arabic": 11,
+  "Noto Sans Arabic": 12,
+  "IBM Plex Sans Arabic": 13,
+  Lalezar: 14,
+  Rakkas: 15,
+  Marhey: 16,
 };
 
 // Segoe UI Emoji fails to properly fallback for some glyphs: ∞, ∫, ≠
