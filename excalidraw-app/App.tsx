@@ -147,6 +147,13 @@ import "./index.scss";
 
 import { ExcalidrawPlusPromoBanner } from "./components/ExcalidrawPlusPromoBanner";
 import { AppSidebar } from "./components/AppSidebar";
+import BoardsDashboard from "./components/BoardsDashboard";
+import { getLocalBoard, saveLocalBoard } from "./data/localBoards";
+import {
+  INSTANTDB_CONFIGURED,
+  saveBoardToInstantDB,
+  useInstantBoard,
+} from "./data/instantdb";
 
 import type { CollabAPI } from "./collab/Collab";
 
@@ -371,8 +378,91 @@ const initializeScene = async (opts: {
   return { scene: null, isExternalScene: false };
 };
 
-const ExcalidrawWrapper = () => {
+const ExcalidrawWrapper = ({
+  activeBoardId,
+}: {
+  activeBoardId: string | null;
+}) => {
   const excalidrawAPI = useExcalidrawAPI();
+
+  // ── Board-specific: load initial data from local/InstantDB ─────────────
+  // Board data is loaded once on mount via the initialStatePromise below.
+  // Auto-save is handled with a debounced onChange callback.
+  const { board: instantBoard } = useInstantBoard(
+    INSTANTDB_CONFIGURED ? activeBoardId : null,
+  );
+
+  // For local storage boards: load synchronously before rendering
+  const localBoardData = activeBoardId && !INSTANTDB_CONFIGURED
+    ? getLocalBoard(activeBoardId)
+    : null;
+
+  // Build board initial scene (elements + appState) once data is available
+  const boardScene = (() => {
+    if (!activeBoardId) {
+      return null;
+    }
+    if (INSTANTDB_CONFIGURED && instantBoard) {
+      try {
+        return {
+          elements: JSON.parse(instantBoard.elements || "[]"),
+          appState: JSON.parse(instantBoard.appState || "{}"),
+        };
+      } catch {
+        return null;
+      }
+    }
+    if (localBoardData) {
+      try {
+        return {
+          elements: JSON.parse(localBoardData.elements || "[]"),
+          appState: JSON.parse(localBoardData.appState || "{}"),
+        };
+      } catch {
+        return null;
+      }
+    }
+    return null;
+  })();
+
+  const boardSceneLoadedRef = useRef(false);
+
+  // Board auto-save debounced (saves every 3s after last change)
+  const saveBoardDebounced = useCallback(
+    debounce(
+      (boardId: string, elementsJSON: string, appStateJSON: string) => {
+        if (INSTANTDB_CONFIGURED) {
+          saveBoardToInstantDB(boardId, {
+            elements: elementsJSON,
+            appState: appStateJSON,
+          }).catch(console.error);
+        } else {
+          saveLocalBoard(boardId, {
+            elements: elementsJSON,
+            appState: appStateJSON,
+          });
+        }
+      },
+      3000,
+    ),
+    [],
+  );
+
+  // When board data loads (InstantDB async), inject into the scene once
+  useEffect(() => {
+    if (!activeBoardId || boardSceneLoadedRef.current || !excalidrawAPI) {
+      return;
+    }
+    if (boardScene) {
+      boardSceneLoadedRef.current = true;
+      excalidrawAPI.updateScene({
+        elements: boardScene.elements,
+        appState: boardScene.appState,
+        captureUpdate: CaptureUpdateAction.NEVER,
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [excalidrawAPI, boardScene, activeBoardId]);
 
   const [errorMessage, setErrorMessage] = useState("");
   const isCollabDisabled = isRunningInIframe();
@@ -716,6 +806,15 @@ const ExcalidrawWrapper = () => {
       });
     }
 
+    // ── Board auto-save (debounced) ──────────────────────────────────────
+    if (activeBoardId) {
+      saveBoardDebounced(
+        activeBoardId,
+        JSON.stringify(elements),
+        JSON.stringify(appState),
+      );
+    }
+
     // Render the debug scene if the debug canvas is available
     if (debugCanvasRef.current && excalidrawAPI) {
       debugRenderer(
@@ -959,6 +1058,17 @@ const ExcalidrawWrapper = () => {
 
           return (
             <div className="excalidraw-ui-top-right">
+              {activeBoardId && (
+                <button
+                  className="lawhaa-back-to-boards"
+                  onClick={() => {
+                    window.location.hash = "#boards";
+                  }}
+                  title="Back to boards dashboard"
+                >
+                  ← Boards
+                </button>
+              )}
               {excalidrawAPI?.getEditorInterface().formFactor === "desktop" && (
                 <ExcalidrawPlusPromoBanner
                   isSignedIn={isExcalidrawPlusSignedUser}
@@ -1269,15 +1379,35 @@ const ExcalidrawWrapper = () => {
 const ExcalidrawApp = () => {
   const isCloudExportWindow =
     window.location.pathname === "/excalidraw-plus-export";
+
+  // ── Hash-based routing (re-render on hashchange) ─────────────────────────
+  const [currentHash, setCurrentHash] = useState(() => window.location.hash);
+
+  useEffect(() => {
+    const onHashChange = () => setCurrentHash(window.location.hash);
+    window.addEventListener("hashchange", onHashChange);
+    return () => window.removeEventListener("hashchange", onHashChange);
+  }, []);
+
   if (isCloudExportWindow) {
     return <ExcalidrawPlusIframeExport />;
+  }
+
+  // ── Boards routing ────────────────────────────────────────────────────────
+  const isDashboard =
+    currentHash === "#boards" || currentHash === "" || currentHash === "#";
+  const boardMatch = currentHash.match(/^#board=([a-f0-9]{32})$/);
+  const activeBoardId = boardMatch ? boardMatch[1] : null;
+
+  if (isDashboard && !boardMatch) {
+    return <BoardsDashboard />;
   }
 
   return (
     <TopErrorBoundary>
       <Provider store={appJotaiStore}>
         <ExcalidrawAPIProvider>
-          <ExcalidrawWrapper />
+          <ExcalidrawWrapper activeBoardId={activeBoardId} />
         </ExcalidrawAPIProvider>
       </Provider>
     </TopErrorBoundary>
