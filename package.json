@@ -90,5 +90,14 @@
   },
   "resolutions": {
     "strip-ansi": "6.0.1"
+  },
+  "dependencies": {
+    "@fontsource/ibm-plex-sans-arabic": "5.2.9",
+    "@fontsource/lalezar": "5.2.7",
+    "@fontsource/marhey": "5.2.8",
+    "@fontsource/noto-sans-arabic": "5.2.10",
+    "@fontsource/playpen-sans": "5.2.8",
+    "@fontsource/playpen-sans-arabic": "5.2.4",
+    "@fontsource/rakkas": "5.2.8"
   }
 }
