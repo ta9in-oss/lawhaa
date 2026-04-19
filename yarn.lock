@@ -2055,37 +2055,37 @@
     "@iconify/types" "^2.0.0"
     mlly "^1.8.0"
 
-"@instantdb/core@1.0.5":
-  version "1.0.5"
-  resolved "https://registry.yarnpkg.com/@instantdb/core/-/core-1.0.5.tgz#34a6d87150b0938c120b6945d2b9369210609a15"
-  integrity sha512-n4BdcfqH3lL+mEGAvm/EU1wDbqAvDRhUmM1lRKBmEk5GtxDR9Y0MeRm3M+7BTvD9W0dAr2GQtqQpCkMgM+XzGg==
+"@instantdb/core@1.0.11":
+  version "1.0.11"
+  resolved "https://registry.yarnpkg.com/@instantdb/core/-/core-1.0.11.tgz#dac53e0aa2a203e170d2343fa3271e44b6ca5116"
+  integrity sha512-OPYSkSToPy0t4TTZxi0SCYU+bSSwD77YBFruFt0K8gE6sTzaIJ6QCVLhQjBc5nuXN79QsmgOAyFkVPpuAAhSVg==
   dependencies:
-    "@instantdb/version" "1.0.5"
+    "@instantdb/version" "1.0.11"
     mutative "^1.0.10"
     uuid "^11.1.0"
 
-"@instantdb/react-common@1.0.5":
-  version "1.0.5"
-  resolved "https://registry.yarnpkg.com/@instantdb/react-common/-/react-common-1.0.5.tgz#2ad55eacd15a568fb039bf571adc3b2012817ecc"
-  integrity sha512-BgsDf6mx7OohwVXc+ZpmBJ2aQN1IVU5HmCV+ToP1UiWYTvJRxq4RPGTs2BLBlZrdevcatYrAb+K9MRmmFdzOgw==
+"@instantdb/react-common@1.0.11":
+  version "1.0.11"
+  resolved "https://registry.yarnpkg.com/@instantdb/react-common/-/react-common-1.0.11.tgz#b885b3fd16896cb1ff335429d2d2c083a6290d13"
+  integrity sha512-ubQZgCWTzU8aVkdV8EDltv9PVxGddUup7tkKk/PzBAbCDnLyZzkbGpCrgta0pOYe4anKjqM00sQxhgLGpbFnKA==
   dependencies:
-    "@instantdb/core" "1.0.5"
-    "@instantdb/version" "1.0.5"
+    "@instantdb/core" "1.0.11"
+    "@instantdb/version" "1.0.11"
 
-"@instantdb/react@1.0.5":
-  version "1.0.5"
-  resolved "https://registry.yarnpkg.com/@instantdb/react/-/react-1.0.5.tgz#e2d7cf732e808fb90f6dc6270899e23a71e4f896"
-  integrity sha512-YT6jERHYdXL8EfBSPDUH9XzhK4DHL7PwFj7HDbV/Yrs59nWRk3CJtBaGqkOQJxTFvkhPrk1A6KIxmqOFEeH+rQ==
+"@instantdb/react@1.0.11":
+  version "1.0.11"
+  resolved "https://registry.yarnpkg.com/@instantdb/react/-/react-1.0.11.tgz#a83f6c674556b47e5bd5bfe80dd1e0dee7a7df29"
+  integrity sha512-gSTfNhcsPgyKhRZCMtRuJoJPrK1M2ux3Yqiw276GiiLJLb2PFhlp+kJHrWR51TLhkzkCH+JBOLdyptvfqHHOAw==
   dependencies:
-    "@instantdb/core" "1.0.5"
-    "@instantdb/react-common" "1.0.5"
-    "@instantdb/version" "1.0.5"
+    "@instantdb/core" "1.0.11"
+    "@instantdb/react-common" "1.0.11"
+    "@instantdb/version" "1.0.11"
     eventsource "^4.0.0"
 
-"@instantdb/version@1.0.5":
-  version "1.0.5"
-  resolved "https://registry.yarnpkg.com/@instantdb/version/-/version-1.0.5.tgz#01d4f2dce746c92fed7154488c5a7938f16ec4e3"
-  integrity sha512-ZCpR6CrF2o23tlELcS+1qpUt3mwwKvXxE8qH4aLJOZQ3Y+s8wkoySbXhde9tgU+RLyYRajqIHoyXn2Arki/oAQ==
+"@instantdb/version@1.0.11":
+  version "1.0.11"
+  resolved "https://registry.yarnpkg.com/@instantdb/version/-/version-1.0.11.tgz#50600f76c840b3ebe5b852c46981b146e9f0401b"
+  integrity sha512-+ZiEA/SYJNBgFdEtFcO7PVthggD7jtuzWV70Gin3QcC2NM9lVheQgLSENuhx5JfHv+fXVbUxKiwAQMQ7Vip1mA==
 
 "@isaacs/cliui@^8.0.2":
   version "8.0.2"
@@ -4300,6 +4300,11 @@ ansi-regex@^5.0.1:
   version "5.0.1"
   resolved "https://registry.yarnpkg.com/ansi-regex/-/ansi-regex-5.0.1.tgz#082cb2c89c9fe8659a311a53bd6a4dc5301db304"
   integrity sha512-quJQXlTSUGL2LH9SUXo8VwsY4soanhgo6LNSm84E1LBcE8s3O0wpdiRzyR9z/ZZJMlMWv37qOOb9pdJlMUEKFQ==
+
+ansi-regex@^6.2.2:
+  version "6.2.2"
+  resolved "https://registry.yarnpkg.com/ansi-regex/-/ansi-regex-6.2.2.tgz#60216eea464d864597ce2832000738a0589650c1"
+  integrity sha512-Bq3SmSpyFHaWjPk8If9yc6svM8c56dB5BAtW4Qbw5jHTwwXXcTLoRMkpDJp6VL0XzlWaCHTXrkFURMYmD0sLqg==
 
 ansi-styles@^3.2.1:
   version "3.2.1"
@@ -9638,12 +9643,19 @@ stringify-object@^3.3.0:
   dependencies:
     ansi-regex "^5.0.1"
 
-strip-ansi@6.0.1, strip-ansi@^6.0.0, strip-ansi@^6.0.1, strip-ansi@^7.0.1:
+strip-ansi@^6.0.0, strip-ansi@^6.0.1:
   version "6.0.1"
   resolved "https://registry.yarnpkg.com/strip-ansi/-/strip-ansi-6.0.1.tgz#9e26c63d30f53443e9489495b2105d37b67a85d9"
   integrity sha512-Y38VPSHcqkFrCpFnQ9vuSXmquuv5oXOKpGeT6aGrr3o3Gc9AlVa6JBfUSOCnbxGGZF+/0ooI7KrPuUSztUdU5A==
   dependencies:
     ansi-regex "^5.0.1"
+
+strip-ansi@^7.0.1:
+  version "7.2.0"
+  resolved "https://registry.yarnpkg.com/strip-ansi/-/strip-ansi-7.2.0.tgz#d22a269522836a627af8d04b5c3fd2c7fa3e32e3"
+  integrity sha512-yDPMNjp4WyfYBkHnjIRLfca1i6KMyGCtsVgoKe/z1+6vukgaENdgGBZt+ZmKPc4gavvEZ5OgHfHdrazhgNyG7w==
+  dependencies:
+    ansi-regex "^6.2.2"
 
 strip-bom@^3.0.0:
   version "3.0.0"

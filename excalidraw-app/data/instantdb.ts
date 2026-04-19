@@ -1,32 +1,42 @@
 /**
- * InstantDB integration for Lawhaa – board persistence and real-time sync.
+ * InstantDB integration for Lawhaa – board persistence, real-time sync,
+ * and Google Auth.
  *
  * InstantDB is an alternative real-time database to Firebase/Firestore.
  * https://instantdb.com
  *
- * To enable InstantDB:
+ * Setup:
  *  1. Create a free app at https://instantdb.com
  *  2. Copy your App ID
- *  3. Set VITE_APP_INSTANTDB_APP_ID=<your-app-id> in .env.development or .env.production
+ *  3. Set VITE_APP_INSTANTDB_APP_ID=<your-app-id> in .env.development / .env.production
  *
- * If the env var is not set this module is a no-op and the app falls back to
- * local-only storage (localStorage / IndexedDB).
+ * Google Auth setup (in the InstantDB dashboard):
+ *  1. Go to your app → Auth → Google
+ *  2. Add your Google OAuth client credentials
+ *  3. Set VITE_APP_GOOGLE_CLIENT_NAME to the client name you registered
+ *     (defaults to "google" if not set)
  *
- * Schema used in InstantDB (created automatically via `tx` on first write):
+ * When VITE_APP_INSTANTDB_APP_ID is not set this module is a no-op and the
+ * app falls back to local-only storage (localStorage).
+ *
+ * Schema (auto-created on first write via `tx`):
  *
  *   boards {
- *     id          string  (InstantDB auto-id)
  *     title       string
  *     elements    string  (JSON)
  *     appState    string  (JSON)
- *     shareToken  string  (random, used for public share links)
+ *     shareToken  string
  *     isPublic    boolean
  *     createdAt   number  (unix ms)
  *     updatedAt   number  (unix ms)
  *   }
  */
 
-import { init, tx, id as idbId } from "@instantdb/react";
+import { init, tx, id as idbId, type User } from "@instantdb/react";
+
+// ─── Re-export User type ──────────────────────────────────────────────────────
+
+export type { User };
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -41,17 +51,28 @@ export interface InstantBoard {
   updatedAt: number;
 }
 
-// ─── Initialisation (lazy / optional) ────────────────────────────────────────
+// ─── Initialisation ───────────────────────────────────────────────────────────
 
 const APP_ID = import.meta.env.VITE_APP_INSTANTDB_APP_ID as string | undefined;
 
+/** Name of the Google OAuth client registered in the InstantDB dashboard. */
+const GOOGLE_CLIENT_NAME = (
+  import.meta.env.VITE_APP_GOOGLE_CLIENT_NAME as string | undefined
+) ?? "google";
+
 export const INSTANTDB_CONFIGURED = !!APP_ID;
 
-// We initialise lazily so that the app works without an APP_ID.
+// Singleton db instance — created once so React hooks are stable across renders.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-let _db: ReturnType<typeof init> | null = null;
+type AnyDB = ReturnType<typeof init>;
 
-export function getInstantDB() {
+let _db: AnyDB | null = null;
+
+/**
+ * Returns the singleton InstantDB instance.
+ * Returns null when VITE_APP_INSTANTDB_APP_ID is not set.
+ */
+export function getInstantDB(): AnyDB | null {
   if (!INSTANTDB_CONFIGURED) {
     return null;
   }
@@ -59,6 +80,65 @@ export function getInstantDB() {
     _db = init({ appId: APP_ID! });
   }
   return _db;
+}
+
+// ─── Auth helpers ─────────────────────────────────────────────────────────────
+
+/**
+ * Initiates the Google OAuth sign-in flow.
+ * Redirects the user to Google; on completion, InstantDB redirects back and
+ * automatically exchanges the code for a session token.
+ */
+export function signInWithGoogle(): void {
+  const db = getInstantDB();
+  if (!db) {
+    console.warn("[InstantDB] Not configured — cannot sign in with Google.");
+    return;
+  }
+  const url = db.auth.createAuthorizationURL({
+    clientName: GOOGLE_CLIENT_NAME,
+    redirectURL: window.location.href,
+  });
+  window.location.href = url;
+}
+
+/**
+ * Signs the current user out.
+ */
+export async function signOutInstantDB(): Promise<void> {
+  const db = getInstantDB();
+  if (!db) {
+    return;
+  }
+  await db.auth.signOut();
+}
+
+/**
+ * Hook: returns the current InstantDB auth state.
+ * `{ user, isLoading, error }` — mirrors InstantDB's useAuth() shape.
+ * Returns a stable "not configured" sentinel when InstantDB is not set up.
+ */
+export function useInstantAuth(): {
+  user: User | null;
+  isLoading: boolean;
+  error: unknown;
+} {
+  const db = getInstantDB();
+
+  // Must call hook unconditionally (Rules of Hooks). When db is null we still
+  // call `db?.useAuth()` which evaluates to undefined and we fall through.
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const result = db?.useAuth();
+
+  if (!db || !result) {
+    return { user: null, isLoading: false, error: null };
+  }
+
+  return {
+    user: result.user ?? null,
+    isLoading: result.isLoading,
+    error: result.error,
+  };
 }
 
 // ─── Board CRUD helpers ───────────────────────────────────────────────────────
@@ -142,10 +222,10 @@ export async function deleteBoardFromInstantDB(
   await db.transact(tx.boards[boardId].delete());
 }
 
-/** Make a board public (returns share URL). */
+/** Make a board public. */
 export async function shareBoardInInstantDB(
   boardId: string,
-  shareToken: string,
+  _shareToken: string,
 ): Promise<void> {
   const db = getInstantDB();
   if (!db) {
@@ -172,8 +252,6 @@ export function useInstantBoards(): {
 } {
   const db = getInstantDB();
 
-  // When InstantDB is not configured, return a stable no-op result.
-  // We call the hook unconditionally (Rules of Hooks) with a disabled flag.
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const result = db?.useQuery({ boards: {} });
 
@@ -212,7 +290,8 @@ export function useInstantBoard(boardId: string | null): {
   }
 
   const { data, isLoading, error } = result;
-  const board = (data?.boards as unknown as InstantBoard[] | undefined)?.[0] ?? null;
+  const board =
+    (data?.boards as unknown as InstantBoard[] | undefined)?.[0] ?? null;
 
   return { board, isLoading, error };
 }
