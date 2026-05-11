@@ -29,6 +29,18 @@
   color: inherit;
 }
 
+.boards-dashboard__logo-icon {
+  display: flex;
+  align-items: center;
+
+  svg {
+    width: 28px;
+    height: 28px;
+    color: var(--color-primary, #5b57d1);
+    fill: var(--color-primary, #5b57d1);
+  }
+}
+
 .boards-dashboard__logo-text {
   font-size: 1.5rem;
   font-weight: 700;
@@ -97,9 +109,14 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 3rem;
-  color: rgba(255, 255, 255, 0.6);
   position: relative;
+
+  svg {
+    width: 48px;
+    height: 48px;
+    color: rgba(255, 255, 255, 0.6);
+    fill: rgba(255, 255, 255, 0.6);
+  }
 }
 
 .board-card__preview--alt1 {
@@ -170,6 +187,12 @@
   gap: 4px;
   transition: background 0.15s;
   white-space: nowrap;
+
+  svg {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+  }
 }
 
 .board-card__action-btn:hover {
@@ -232,6 +255,12 @@
   font-size: 0.9rem;
   font-weight: 500;
   transition: background 0.15s, opacity 0.15s;
+
+  svg {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+  }
 }
 
 .btn--primary {
@@ -324,8 +353,17 @@
 }
 
 .boards-dashboard__empty-icon {
-  font-size: 4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   margin-bottom: 12px;
+
+  svg {
+    width: 56px;
+    height: 56px;
+    color: #bbb;
+    fill: #bbb;
+  }
 }
 
 .boards-dashboard__empty-text {
@@ -345,6 +383,13 @@
   border-radius: 99px;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: #fff;
+
+  svg {
+    width: 12px;
+    height: 12px;
+    fill: #fff;
+    color: #fff;
+  }
 }
 
 /* ─── User info strip ────────────────────────────────────────────────────── */

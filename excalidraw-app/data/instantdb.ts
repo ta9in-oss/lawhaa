@@ -47,6 +47,7 @@ export interface InstantBoard {
   appState: string; // JSON string of partial AppState
   shareToken: string;
   isPublic: boolean;
+  ownerId: string;
   createdAt: number;
   updatedAt: number;
 }
@@ -152,7 +153,10 @@ function generateShareToken(): string {
 }
 
 /** Create a new board in InstantDB. Returns the new board id. */
-export async function createBoardInInstantDB(title: string): Promise<string> {
+export async function createBoardInInstantDB(
+  title: string,
+  userId?: string,
+): Promise<string> {
   const db = getInstantDB();
   if (!db) {
     throw new Error("InstantDB is not configured");
@@ -168,6 +172,7 @@ export async function createBoardInInstantDB(title: string): Promise<string> {
       appState: "{}",
       shareToken: generateShareToken(),
       isPublic: false,
+      ownerId: userId ?? "",
       createdAt: now,
       updatedAt: now,
     }),

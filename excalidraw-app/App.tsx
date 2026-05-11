@@ -1396,7 +1396,7 @@ const ExcalidrawApp = () => {
   // ── Boards routing ────────────────────────────────────────────────────────
   const isDashboard =
     currentHash === "#boards" || currentHash === "" || currentHash === "#";
-  const boardMatch = currentHash.match(/^#board=([a-f0-9]{32})$/);
+  const boardMatch = currentHash.match(/^#board=([\w-]+)$/);
   const activeBoardId = boardMatch ? boardMatch[1] : null;
 
   if (isDashboard && !boardMatch) {
