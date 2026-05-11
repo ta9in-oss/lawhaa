@@ -427,6 +427,11 @@ const ExcalidrawWrapper = ({
 
   const boardSceneLoadedRef = useRef(false);
 
+  // Reset load guard when board changes so navigating board-to-board works
+  useEffect(() => {
+    boardSceneLoadedRef.current = false;
+  }, [activeBoardId]);
+
   // Board auto-save debounced (saves every 3s after last change)
   const saveBoardDebounced = useCallback(
     debounce(
@@ -617,11 +622,32 @@ const ExcalidrawWrapper = ({
 
     initializeScene({ collabAPI, excalidrawAPI }).then(async (data) => {
       loadImages(data, /* isInitialLoad */ true);
-      initialStatePromiseRef.current.promise.resolve(data.scene);
+      // When opening a board, start with an empty canvas — the actual board data
+      // arrives asynchronously from InstantDB and is injected via updateScene().
+      // This prevents a flash of unrelated localStorage content.
+      if (activeBoardId && INSTANTDB_CONFIGURED) {
+        initialStatePromiseRef.current.promise.resolve({
+          elements: [],
+          appState: {},
+        });
+      } else {
+        initialStatePromiseRef.current.promise.resolve(data.scene);
+      }
     });
 
     const onHashChange = async (event: HashChangeEvent) => {
       event.preventDefault();
+      const newHash = window.location.hash;
+      // Board navigation is handled by parent routing + useInstantBoard subscription;
+      // let those mechanisms load board data rather than overwriting with localStorage.
+      if (INSTANTDB_CONFIGURED && /^#board=([\w-]+)$/.test(newHash)) {
+        excalidrawAPI.updateScene({
+          elements: [],
+          appState: { isLoading: true },
+          captureUpdate: CaptureUpdateAction.NEVER,
+        });
+        return;
+      }
       const libraryUrlTokens = parseLibraryTokensFromUrl();
       if (!libraryUrlTokens) {
         if (
