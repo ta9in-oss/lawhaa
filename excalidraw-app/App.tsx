@@ -397,32 +397,30 @@ const ExcalidrawWrapper = ({
     ? getLocalBoard(activeBoardId)
     : null;
 
-  // Build board initial scene (elements + appState) once data is available
+  // Build board initial scene (elements + appState) once data is available.
+  // Use restoreElements/restoreAppState so complex types (e.g. collaborators Map)
+  // are properly reconstructed after JSON round-tripping.
   const boardScene = (() => {
     if (!activeBoardId) {
       return null;
     }
-    if (INSTANTDB_CONFIGURED && instantBoard) {
-      try {
-        return {
-          elements: JSON.parse(instantBoard.elements || "[]"),
-          appState: JSON.parse(instantBoard.appState || "{}"),
-        };
-      } catch {
-        return null;
-      }
+    const raw = INSTANTDB_CONFIGURED ? instantBoard : localBoardData;
+    if (!raw) {
+      return null;
     }
-    if (localBoardData) {
-      try {
-        return {
-          elements: JSON.parse(localBoardData.elements || "[]"),
-          appState: JSON.parse(localBoardData.appState || "{}"),
-        };
-      } catch {
-        return null;
-      }
+    try {
+      const parsedElements = JSON.parse(raw.elements || "[]");
+      const parsedAppState = JSON.parse(raw.appState || "{}");
+      return {
+        elements: restoreElements(parsedElements, null, {
+          repairBindings: true,
+          deleteInvisibleElements: false,
+        }),
+        appState: restoreAppState(parsedAppState, null),
+      };
+    } catch {
+      return null;
     }
-    return null;
   })();
 
   const boardSceneLoadedRef = useRef(false);
@@ -1433,7 +1431,7 @@ const ExcalidrawApp = () => {
     <TopErrorBoundary>
       <Provider store={appJotaiStore}>
         <ExcalidrawAPIProvider>
-          <ExcalidrawWrapper activeBoardId={activeBoardId} />
+          <ExcalidrawWrapper key={activeBoardId ?? "__scratch__"} activeBoardId={activeBoardId} />
         </ExcalidrawAPIProvider>
       </Provider>
     </TopErrorBoundary>
