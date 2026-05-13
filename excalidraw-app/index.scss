@@ -148,3 +148,68 @@
     background: var(--color-surface-mid, #f0f0f0);
   }
 }
+
+// ── Lawhaa: Board save indicator ──────────────────────────────────────────────
+.board-save-indicator {
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  pointer-events: none;
+  z-index: var(--zIndex-layerUI);
+  transition: opacity 0.3s ease;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.12);
+
+  svg {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+  }
+
+  &--pending {
+    background: var(--color-surface-primary, #fff);
+    color: var(--color-text-secondary, #666);
+    border: 1px solid var(--color-border, #e0e0e0);
+
+    svg {
+      animation: board-save-pulse 1.2s ease-in-out infinite;
+    }
+  }
+
+  &--saved {
+    background: var(--color-success-background, #ecfdf5);
+    color: var(--color-success, #16a34a);
+    border: 1px solid var(--color-success-border, #bbf7d0);
+    animation: board-save-fadein 0.2s ease;
+  }
+
+  .theme--dark & {
+    &--pending {
+      background: var(--color-surface-primary, #232329);
+      color: var(--color-text-secondary, #aaa);
+      border-color: var(--color-border, #3a3a4a);
+    }
+    &--saved {
+      background: #052e16;
+      color: #4ade80;
+      border-color: #166534;
+    }
+  }
+}
+
+@keyframes board-save-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+@keyframes board-save-fadein {
+  from { opacity: 0; transform: translateX(-50%) translateY(4px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}

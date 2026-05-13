@@ -47,6 +47,8 @@ import {
   exportToPlus,
   share,
   youtubeIcon,
+  checkIcon,
+  save as saveIcon,
 } from "@excalidraw/excalidraw/components/icons";
 import { isElementLink } from "@excalidraw/element";
 import {
@@ -385,6 +387,16 @@ const ExcalidrawWrapper = ({
 }) => {
   const excalidrawAPI = useExcalidrawAPI();
 
+  // ── Board save status ──────────────────────────────────────────────────
+  const [saveStatus, setSaveStatus] = useState<"idle" | "pending" | "saved">("idle");
+  const saveStatusTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const setSaved = useCallback(() => {
+    setSaveStatus("saved");
+    if (saveStatusTimerRef.current) clearTimeout(saveStatusTimerRef.current);
+    saveStatusTimerRef.current = setTimeout(() => setSaveStatus("idle"), 2500);
+  }, []);
+
   // ── Board-specific: load initial data from local/InstantDB ─────────────
   // Board data is loaded once on mount via the initialStatePromise below.
   // Auto-save is handled with a debounced onChange callback.
@@ -436,17 +448,18 @@ const ExcalidrawWrapper = ({
   // Board auto-save debounced (saves every 3s after last change)
   const saveBoardDebounced = useCallback(
     debounce(
-      (boardId: string, elementsJSON: string, appStateJSON: string) => {
+      (boardId: string, elementsJSON: string, appStateJSON: string, onSaved: () => void) => {
         if (INSTANTDB_CONFIGURED) {
           saveBoardToInstantDB(boardId, {
             elements: elementsJSON,
             appState: appStateJSON,
-          }).catch(console.error);
+          }).then(onSaved).catch(console.error);
         } else {
           saveLocalBoard(boardId, {
             elements: elementsJSON,
             appState: appStateJSON,
           });
+          onSaved();
         }
       },
       3000,
@@ -849,10 +862,12 @@ const ExcalidrawWrapper = ({
       // Only persist view/display state — skip un-serializable fields like
       // collaborators (a Map) and transient UI state.
       const { collaborators: _c, isLoading: _l, errorMessage: _e, ...serializableAppState } = appState as AppState & { collaborators: unknown };
+      setSaveStatus("pending");
       saveBoardDebounced(
         activeBoardId,
         JSON.stringify(elements),
         JSON.stringify(serializableAppState),
+        setSaved,
       );
     }
 
@@ -1411,6 +1426,12 @@ const ExcalidrawWrapper = ({
             scale={window.devicePixelRatio}
             ref={debugCanvasRef}
           />
+        )}
+        {activeBoardId && saveStatus !== "idle" && (
+          <div className={`board-save-indicator board-save-indicator--${saveStatus}`}>
+            {saveStatus === "pending" ? saveIcon : checkIcon}
+            <span>{saveStatus === "pending" ? "Saving…" : "Saved"}</span>
+          </div>
         )}
       </Excalidraw>
     </div>
