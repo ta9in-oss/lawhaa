@@ -398,8 +398,9 @@ const ExcalidrawWrapper = ({
     : null;
 
   // Build board initial scene (elements + appState) once data is available.
-  // Use restoreElements/restoreAppState so complex types (e.g. collaborators Map)
-  // are properly reconstructed after JSON round-tripping.
+  // Use restoreElements/restoreAppState so complex types are reconstructed
+  // after JSON round-tripping. Collaborators is always reset to a new Map
+  // since it's a non-serializable runtime-only field.
   const boardScene = (() => {
     if (!activeBoardId) {
       return null;
@@ -411,6 +412,8 @@ const ExcalidrawWrapper = ({
     try {
       const parsedElements = JSON.parse(raw.elements || "[]");
       const parsedAppState = JSON.parse(raw.appState || "{}");
+      // Strip collaborators before restore so it falls back to default new Map()
+      delete parsedAppState.collaborators;
       return {
         elements: restoreElements(parsedElements, null, {
           repairBindings: true,
@@ -832,10 +835,13 @@ const ExcalidrawWrapper = ({
 
     // ── Board auto-save (debounced) ──────────────────────────────────────
     if (activeBoardId) {
+      // Only persist view/display state — skip un-serializable fields like
+      // collaborators (a Map) and transient UI state.
+      const { collaborators: _c, isLoading: _l, errorMessage: _e, ...serializableAppState } = appState as AppState & { collaborators: unknown };
       saveBoardDebounced(
         activeBoardId,
         JSON.stringify(elements),
-        JSON.stringify(appState),
+        JSON.stringify(serializableAppState),
       );
     }
 
