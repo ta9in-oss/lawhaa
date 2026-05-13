@@ -428,10 +428,10 @@ const ExcalidrawWrapper = ({
 
   const boardSceneLoadedRef = useRef(false);
 
-  // Reset load guard when board changes so navigating board-to-board works
-  useEffect(() => {
-    boardSceneLoadedRef.current = false;
-  }, [activeBoardId]);
+  // Always-current ref so async callbacks (initializeScene promise) can read
+  // the latest boardScene without a stale closure.
+  const boardSceneRef = useRef(boardScene);
+  boardSceneRef.current = boardScene;
 
   // Board auto-save debounced (saves every 3s after last change)
   const saveBoardDebounced = useCallback(
@@ -623,14 +623,25 @@ const ExcalidrawWrapper = ({
 
     initializeScene({ collabAPI, excalidrawAPI }).then(async (data) => {
       loadImages(data, /* isInitialLoad */ true);
-      // When opening a board, start with an empty canvas — the actual board data
-      // arrives asynchronously from InstantDB and is injected via updateScene().
-      // This prevents a flash of unrelated localStorage content.
       if (activeBoardId && INSTANTDB_CONFIGURED) {
-        initialStatePromiseRef.current.promise.resolve({
-          elements: [],
-          appState: {},
-        });
+        // If board data is already available (e.g. InstantDB cache on revisit),
+        // use it as initial state to avoid a race where initialStatePromise
+        // resolves *after* updateScene and wipes the board content.
+        const cached = boardSceneRef.current;
+        if (cached) {
+          boardSceneLoadedRef.current = true;
+          initialStatePromiseRef.current.promise.resolve({
+            elements: cached.elements,
+            appState: cached.appState,
+          });
+        } else {
+          // Data not yet available — resolve with empty canvas; updateScene
+          // will inject board content once InstantDB responds.
+          initialStatePromiseRef.current.promise.resolve({
+            elements: [],
+            appState: {},
+          });
+        }
       } else {
         initialStatePromiseRef.current.promise.resolve(data.scene);
       }
