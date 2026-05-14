@@ -390,6 +390,9 @@ const ExcalidrawWrapper = ({
   // ── Board save status ──────────────────────────────────────────────────
   const [saveStatus, setSaveStatus] = useState<"idle" | "pending" | "saved">("idle");
   const saveStatusTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Track the last elements JSON that was actually persisted so we only mark
+  // "pending" when real content changes, not on every viewport/scroll event.
+  const lastSavedElementsRef = useRef<string>("");
 
   const setSaved = useCallback(() => {
     setSaveStatus("saved");
@@ -445,21 +448,25 @@ const ExcalidrawWrapper = ({
   const boardSceneRef = useRef(boardScene);
   boardSceneRef.current = boardScene;
 
-  // Board auto-save debounced (saves every 3s after last change)
+  // Board auto-save debounced (saves every 3s after last content change)
   const saveBoardDebounced = useCallback(
     debounce(
-      (boardId: string, elementsJSON: string, appStateJSON: string, onSaved: () => void) => {
+      (boardId: string, elementsJSON: string, onSaved: () => void) => {
+        const onDone = () => {
+          lastSavedElementsRef.current = elementsJSON;
+          onSaved();
+        };
         if (INSTANTDB_CONFIGURED) {
           saveBoardToInstantDB(boardId, {
             elements: elementsJSON,
-            appState: appStateJSON,
-          }).then(onSaved).catch(console.error);
+            appState: "{}",
+          }).then(onDone).catch(console.error);
         } else {
           saveLocalBoard(boardId, {
             elements: elementsJSON,
-            appState: appStateJSON,
+            appState: "{}",
           });
-          onSaved();
+          onDone();
         }
       },
       3000,
@@ -859,14 +866,16 @@ const ExcalidrawWrapper = ({
 
     // ── Board auto-save (debounced) ──────────────────────────────────────
     if (activeBoardId) {
-      // Only persist view/display state — skip un-serializable fields like
-      // collaborators (a Map) and transient UI state.
-      const { collaborators: _c, isLoading: _l, errorMessage: _e, ...serializableAppState } = appState as AppState & { collaborators: unknown };
+      const elementsJSON = JSON.stringify(elements);
+      // Only save (and show indicator) when elements actually changed.
+      // Ignoring viewport/scroll/pointer changes prevents endless "Saving…".
+      if (elementsJSON === lastSavedElementsRef.current) {
+        return;
+      }
       setSaveStatus("pending");
       saveBoardDebounced(
         activeBoardId,
-        JSON.stringify(elements),
-        JSON.stringify(serializableAppState),
+        elementsJSON,
         setSaved,
       );
     }
