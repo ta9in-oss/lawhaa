@@ -324,6 +324,10 @@ import {
   actionToggleArrowBinding,
   actionToggleMidpointSnapping,
   actionToggleCropEditor,
+  actionBooleanUnion,
+  actionBooleanIntersection,
+  actionBooleanDifference,
+  actionBooleanXor,
 } from "../actions";
 import { actionWrapTextInContainer } from "../actions/actionBoundText";
 import { actionToggleHandTool, zoomToFit } from "../actions/actionCanvas";
