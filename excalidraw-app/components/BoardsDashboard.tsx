@@ -1,5 +1,14 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
+  pencilIcon,
+  TrashIcon,
+  LinkIcon,
+  LockedIcon,
+  ImageIcon,
+  checkIcon,
+  boltIcon,
+} from "@excalidraw/excalidraw/components/icons";
+import {
   INSTANTDB_CONFIGURED,
   useInstantAuth,
   useInstantBoards,
@@ -90,7 +99,7 @@ const ShareDialog: React.FC<ShareDialogProps> = ({
               This board is private. Make it public to generate a shareable link.
             </p>
             <button className="btn btn--primary" onClick={onMakePublic}>
-              🔗 Make Public & Copy Link
+              {LinkIcon} Make Public & Copy Link
             </button>
           </>
         ) : (
@@ -107,7 +116,7 @@ const ShareDialog: React.FC<ShareDialogProps> = ({
                 onFocus={(e) => e.target.select()}
               />
               <button className="btn btn--primary" onClick={handleCopy}>
-                {copied ? "✓ Copied!" : "Copy"}
+                {copied ? <>{checkIcon} Copied!</> : "Copy"}
               </button>
             </div>
           </>
@@ -169,7 +178,7 @@ const BoardCard: React.FC<BoardCardProps> = ({
       <div
         className={`board-card__preview${grad ? ` board-card__preview--${grad}` : ""}`}
       >
-        ✏️
+        {pencilIcon}
         {board.isPublic && (
           <span
             style={{
@@ -224,21 +233,21 @@ const BoardCard: React.FC<BoardCardProps> = ({
           }}
           title="Rename"
         >
-          ✏️ Rename
+          {pencilIcon} Rename
         </button>
         <button
           className="board-card__action-btn"
           onClick={onShare}
           title="Share"
         >
-          🔗 Share
+          {LinkIcon} Share
         </button>
         <button
           className="board-card__action-btn board-card__action-btn--danger"
           onClick={onDelete}
           title="Delete"
         >
-          🗑️
+          {TrashIcon}
         </button>
       </div>
     </div>
@@ -252,13 +261,13 @@ const LoginScreen: React.FC = () => {
     <div className="boards-dashboard">
       <header className="boards-dashboard__header">
         <div className="boards-dashboard__logo">
-          <span style={{ fontSize: "2rem" }}>✏️</span>
+          <span className="boards-dashboard__logo-icon">{pencilIcon}</span>
           <span className="boards-dashboard__logo-text">Lawhaa</span>
         </div>
       </header>
       <main className="boards-dashboard__content">
         <div className="boards-dashboard__empty">
-          <div className="boards-dashboard__empty-icon">🔐</div>
+          <div className="boards-dashboard__empty-icon">{LockedIcon}</div>
           <div className="boards-dashboard__empty-text">
             Sign in to manage and sync your boards across devices.
           </div>
@@ -349,14 +358,14 @@ const BoardsDashboardInner: React.FC<BoardsDashboardInnerProps> = ({
 
     if (INSTANTDB_CONFIGURED) {
       const { createBoardInInstantDB } = await import("../data/instantdb");
-      const id = await createBoardInInstantDB(title);
+      const id = await createBoardInInstantDB(title, user?.id);
       openBoard(id);
     } else {
       const meta = createLocalBoard(title);
       setLocalBoards(listBoards());
       openBoard(meta.id);
     }
-  }, [boards]);
+  }, [boards, user]);
 
   const handleRename = useCallback(
     async (id: string, title: string) => {
@@ -403,13 +412,13 @@ const BoardsDashboardInner: React.FC<BoardsDashboardInnerProps> = ({
       {/* Header */}
       <header className="boards-dashboard__header">
         <div className="boards-dashboard__logo">
-          <span style={{ fontSize: "2rem" }}>✏️</span>
+          <span className="boards-dashboard__logo-icon">{pencilIcon}</span>
           <span className="boards-dashboard__logo-text">Lawhaa</span>
         </div>
 
         <div className="boards-dashboard__header-actions">
           {INSTANTDB_CONFIGURED && (
-            <span className="instantdb-badge">⚡ InstantDB</span>
+            <span className="instantdb-badge">{boltIcon} InstantDB</span>
           )}
           {user && (
             <div className="boards-dashboard__user">
@@ -441,7 +450,7 @@ const BoardsDashboardInner: React.FC<BoardsDashboardInnerProps> = ({
           </div>
         ) : !boards || boards.length === 0 ? (
           <div className="boards-dashboard__empty">
-            <div className="boards-dashboard__empty-icon">🖼️</div>
+            <div className="boards-dashboard__empty-icon">{ImageIcon}</div>
             <div className="boards-dashboard__empty-text">
               No boards yet. Create one to get started!
             </div>

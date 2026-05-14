@@ -47,6 +47,8 @@ import {
   exportToPlus,
   share,
   youtubeIcon,
+  checkIcon,
+  save as saveIcon,
 } from "@excalidraw/excalidraw/components/icons";
 import { isElementLink } from "@excalidraw/element";
 import {
@@ -385,6 +387,19 @@ const ExcalidrawWrapper = ({
 }) => {
   const excalidrawAPI = useExcalidrawAPI();
 
+  // ── Board save status ──────────────────────────────────────────────────
+  const [saveStatus, setSaveStatus] = useState<"idle" | "pending" | "saved">("idle");
+  const saveStatusTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Track the last elements JSON that was actually persisted so we only mark
+  // "pending" when real content changes, not on every viewport/scroll event.
+  const lastSavedElementsRef = useRef<string>("");
+
+  const setSaved = useCallback(() => {
+    setSaveStatus("saved");
+    if (saveStatusTimerRef.current) clearTimeout(saveStatusTimerRef.current);
+    saveStatusTimerRef.current = setTimeout(() => setSaveStatus("idle"), 2500);
+  }, []);
+
   // ── Board-specific: load initial data from local/InstantDB ─────────────
   // Board data is loaded once on mount via the initialStatePromise below.
   // Auto-save is handled with a debounced onChange callback.
@@ -397,50 +412,61 @@ const ExcalidrawWrapper = ({
     ? getLocalBoard(activeBoardId)
     : null;
 
-  // Build board initial scene (elements + appState) once data is available
+  // Build board initial scene (elements + appState) once data is available.
+  // Use restoreElements/restoreAppState so complex types are reconstructed
+  // after JSON round-tripping. Collaborators is always reset to a new Map
+  // since it's a non-serializable runtime-only field.
   const boardScene = (() => {
     if (!activeBoardId) {
       return null;
     }
-    if (INSTANTDB_CONFIGURED && instantBoard) {
-      try {
-        return {
-          elements: JSON.parse(instantBoard.elements || "[]"),
-          appState: JSON.parse(instantBoard.appState || "{}"),
-        };
-      } catch {
-        return null;
-      }
+    const raw = INSTANTDB_CONFIGURED ? instantBoard : localBoardData;
+    if (!raw) {
+      return null;
     }
-    if (localBoardData) {
-      try {
-        return {
-          elements: JSON.parse(localBoardData.elements || "[]"),
-          appState: JSON.parse(localBoardData.appState || "{}"),
-        };
-      } catch {
-        return null;
-      }
+    try {
+      const parsedElements = JSON.parse(raw.elements || "[]");
+      const parsedAppState = JSON.parse(raw.appState || "{}");
+      // Strip collaborators before restore so it falls back to default new Map()
+      delete parsedAppState.collaborators;
+      return {
+        elements: restoreElements(parsedElements, null, {
+          repairBindings: true,
+          deleteInvisibleElements: false,
+        }),
+        appState: restoreAppState(parsedAppState, null),
+      };
+    } catch {
+      return null;
     }
-    return null;
   })();
 
   const boardSceneLoadedRef = useRef(false);
 
-  // Board auto-save debounced (saves every 3s after last change)
+  // Always-current ref so async callbacks (initializeScene promise) can read
+  // the latest boardScene without a stale closure.
+  const boardSceneRef = useRef(boardScene);
+  boardSceneRef.current = boardScene;
+
+  // Board auto-save debounced (saves every 3s after last content change)
   const saveBoardDebounced = useCallback(
     debounce(
-      (boardId: string, elementsJSON: string, appStateJSON: string) => {
+      (boardId: string, elementsJSON: string, onSaved: () => void) => {
+        const onDone = () => {
+          lastSavedElementsRef.current = elementsJSON;
+          onSaved();
+        };
         if (INSTANTDB_CONFIGURED) {
           saveBoardToInstantDB(boardId, {
             elements: elementsJSON,
-            appState: appStateJSON,
-          }).catch(console.error);
+            appState: "{}",
+          }).then(onDone).catch(console.error);
         } else {
           saveLocalBoard(boardId, {
             elements: elementsJSON,
-            appState: appStateJSON,
+            appState: "{}",
           });
+          onDone();
         }
       },
       3000,
@@ -617,11 +643,43 @@ const ExcalidrawWrapper = ({
 
     initializeScene({ collabAPI, excalidrawAPI }).then(async (data) => {
       loadImages(data, /* isInitialLoad */ true);
-      initialStatePromiseRef.current.promise.resolve(data.scene);
+      if (activeBoardId && INSTANTDB_CONFIGURED) {
+        // If board data is already available (e.g. InstantDB cache on revisit),
+        // use it as initial state to avoid a race where initialStatePromise
+        // resolves *after* updateScene and wipes the board content.
+        const cached = boardSceneRef.current;
+        if (cached) {
+          boardSceneLoadedRef.current = true;
+          initialStatePromiseRef.current.promise.resolve({
+            elements: cached.elements,
+            appState: cached.appState,
+          });
+        } else {
+          // Data not yet available — resolve with empty canvas; updateScene
+          // will inject board content once InstantDB responds.
+          initialStatePromiseRef.current.promise.resolve({
+            elements: [],
+            appState: {},
+          });
+        }
+      } else {
+        initialStatePromiseRef.current.promise.resolve(data.scene);
+      }
     });
 
     const onHashChange = async (event: HashChangeEvent) => {
       event.preventDefault();
+      const newHash = window.location.hash;
+      // Board navigation is handled by parent routing + useInstantBoard subscription;
+      // let those mechanisms load board data rather than overwriting with localStorage.
+      if (INSTANTDB_CONFIGURED && /^#board=([\w-]+)$/.test(newHash)) {
+        excalidrawAPI.updateScene({
+          elements: [],
+          appState: { isLoading: true },
+          captureUpdate: CaptureUpdateAction.NEVER,
+        });
+        return;
+      }
       const libraryUrlTokens = parseLibraryTokensFromUrl();
       if (!libraryUrlTokens) {
         if (
@@ -808,10 +866,17 @@ const ExcalidrawWrapper = ({
 
     // ── Board auto-save (debounced) ──────────────────────────────────────
     if (activeBoardId) {
+      const elementsJSON = JSON.stringify(elements);
+      // Only save (and show indicator) when elements actually changed.
+      // Ignoring viewport/scroll/pointer changes prevents endless "Saving…".
+      if (elementsJSON === lastSavedElementsRef.current) {
+        return;
+      }
+      setSaveStatus("pending");
       saveBoardDebounced(
         activeBoardId,
-        JSON.stringify(elements),
-        JSON.stringify(appState),
+        elementsJSON,
+        setSaved,
       );
     }
 
@@ -1371,6 +1436,12 @@ const ExcalidrawWrapper = ({
             ref={debugCanvasRef}
           />
         )}
+        {activeBoardId && saveStatus !== "idle" && (
+          <div className={`board-save-indicator board-save-indicator--${saveStatus}`}>
+            {saveStatus === "pending" ? saveIcon : checkIcon}
+            <span>{saveStatus === "pending" ? "Saving…" : "Saved"}</span>
+          </div>
+        )}
       </Excalidraw>
     </div>
   );
@@ -1396,7 +1467,7 @@ const ExcalidrawApp = () => {
   // ── Boards routing ────────────────────────────────────────────────────────
   const isDashboard =
     currentHash === "#boards" || currentHash === "" || currentHash === "#";
-  const boardMatch = currentHash.match(/^#board=([a-f0-9]{32})$/);
+  const boardMatch = currentHash.match(/^#board=([\w-]+)$/);
   const activeBoardId = boardMatch ? boardMatch[1] : null;
 
   if (isDashboard && !boardMatch) {
@@ -1407,7 +1478,7 @@ const ExcalidrawApp = () => {
     <TopErrorBoundary>
       <Provider store={appJotaiStore}>
         <ExcalidrawAPIProvider>
-          <ExcalidrawWrapper activeBoardId={activeBoardId} />
+          <ExcalidrawWrapper key={activeBoardId ?? "__scratch__"} activeBoardId={activeBoardId} />
         </ExcalidrawAPIProvider>
       </Provider>
     </TopErrorBoundary>
