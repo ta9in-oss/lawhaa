@@ -45,7 +45,8 @@ import {
 } from "../components/icons";
 
 import { t } from "../i18n";
-import { getSelectedElements } from "../scene";
+import { getSelectedElements, isSomeElementSelected } from "../scene";
+import { ToolButton } from "../components/ToolButton";
 import { register } from "./register";
 
 import type { AppClassProperties, AppState } from "../types";
@@ -279,6 +280,17 @@ export const actionBooleanUnion = register({
     performBooleanOp("union", elements, appState, app),
   predicate: (elements, appState) =>
     atLeastTwoPolygonableSelected(elements, appState),
+  PanelComponent: ({ elements, appState, updateData }) => (
+    <ToolButton
+      type="button"
+      icon={booleanUnionIcon}
+      onClick={() => updateData(null)}
+      title={t("labels.booleanUnion")}
+      aria-label={t("labels.booleanUnion")}
+      visible={isSomeElementSelected(getNonDeletedElements(elements), appState)}
+      hidden={!atLeastTwoPolygonableSelected(elements, appState)}
+    />
+  ),
 });
 
 export const actionBooleanIntersection = register({
@@ -290,6 +302,17 @@ export const actionBooleanIntersection = register({
     performBooleanOp("intersection", elements, appState, app),
   predicate: (elements, appState) =>
     atLeastTwoPolygonableSelected(elements, appState),
+  PanelComponent: ({ elements, appState, updateData }) => (
+    <ToolButton
+      type="button"
+      icon={booleanIntersectIcon}
+      onClick={() => updateData(null)}
+      title={t("labels.booleanIntersection")}
+      aria-label={t("labels.booleanIntersection")}
+      visible={isSomeElementSelected(getNonDeletedElements(elements), appState)}
+      hidden={!atLeastTwoPolygonableSelected(elements, appState)}
+    />
+  ),
 });
 
 export const actionBooleanDifference = register({
@@ -301,6 +324,17 @@ export const actionBooleanDifference = register({
     performBooleanOp("difference", elements, appState, app),
   predicate: (elements, appState) =>
     atLeastTwoPolygonableSelected(elements, appState),
+  PanelComponent: ({ elements, appState, updateData }) => (
+    <ToolButton
+      type="button"
+      icon={booleanDifferenceIcon}
+      onClick={() => updateData(null)}
+      title={t("labels.booleanDifference")}
+      aria-label={t("labels.booleanDifference")}
+      visible={isSomeElementSelected(getNonDeletedElements(elements), appState)}
+      hidden={!atLeastTwoPolygonableSelected(elements, appState)}
+    />
+  ),
 });
 
 export const actionBooleanXor = register({
@@ -312,4 +346,15 @@ export const actionBooleanXor = register({
     performBooleanOp("xor", elements, appState, app),
   predicate: (elements, appState) =>
     atLeastTwoPolygonableSelected(elements, appState),
+  PanelComponent: ({ elements, appState, updateData }) => (
+    <ToolButton
+      type="button"
+      icon={booleanXorIcon}
+      onClick={() => updateData(null)}
+      title={t("labels.booleanXor")}
+      aria-label={t("labels.booleanXor")}
+      visible={isSomeElementSelected(getNonDeletedElements(elements), appState)}
+      hidden={!atLeastTwoPolygonableSelected(elements, appState)}
+    />
+  ),
 });
