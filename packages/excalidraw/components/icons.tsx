@@ -2492,3 +2492,38 @@ export const settingsIcon = createIcon(
   </g>,
   tablerIconProps,
 );
+
+// Boolean operations icons (tabler-icons style)
+export const booleanUnionIcon = createIcon(
+  <g>
+    <rect x="3" y="3" width="12" height="12" rx="1" />
+    <rect x="9" y="9" width="12" height="12" rx="1" />
+  </g>,
+  tablerIconProps,
+);
+
+export const booleanIntersectIcon = createIcon(
+  <g>
+    <rect x="3" y="3" width="12" height="12" rx="1" opacity="0.5" />
+    <rect x="9" y="9" width="12" height="12" rx="1" opacity="0.5" />
+    <rect x="9" y="9" width="6" height="6" rx="1" />
+  </g>,
+  tablerIconProps,
+);
+
+export const booleanDifferenceIcon = createIcon(
+  <g>
+    <rect x="3" y="3" width="12" height="12" rx="1" />
+    <rect x="9" y="9" width="12" height="12" rx="1" fill="var(--color-surface-primary, white)" stroke="currentColor" />
+  </g>,
+  tablerIconProps,
+);
+
+export const booleanXorIcon = createIcon(
+  <g>
+    <rect x="3" y="3" width="12" height="12" rx="1" opacity="0.5" />
+    <rect x="9" y="9" width="12" height="12" rx="1" opacity="0.5" />
+    <rect x="9" y="9" width="6" height="6" rx="1" fill="var(--color-surface-primary, white)" stroke="currentColor" />
+  </g>,
+  tablerIconProps,
+);

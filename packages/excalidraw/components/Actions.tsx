@@ -305,6 +305,10 @@ export const SelectedShapeActions = ({
               renderAction("deleteSelectedElements")}
             {renderAction("group")}
             {renderAction("ungroup")}
+            {renderAction("booleanUnion")}
+            {renderAction("booleanIntersection")}
+            {renderAction("booleanDifference")}
+            {renderAction("booleanXor")}
             {showLinkIcon && renderAction("hyperlink")}
             {showCropEditorAction && renderAction("cropEditor")}
             {showLineEditorAction && renderAction("toggleLinearEditor")}
@@ -744,6 +748,10 @@ const CombinedExtraActions = ({
                 <div className="buttonList">
                   {renderAction("group")}
                   {renderAction("ungroup")}
+                  {renderAction("booleanUnion")}
+                  {renderAction("booleanIntersection")}
+                  {renderAction("booleanDifference")}
+                  {renderAction("booleanXor")}
                   {showLinkIcon && renderAction("hyperlink")}
                   {showCropEditorAction && renderAction("cropEditor")}
                   {showDuplicate && renderAction("duplicateSelection")}
