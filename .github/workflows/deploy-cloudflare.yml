@@ -24,6 +24,11 @@ jobs:
 
       - name: Run tests
         run: yarn vitest run
+        env:
+          VITE_APP_INSTANTDB_APP_ID: ${{ secrets.VITE_APP_INSTANTDB_APP_ID }}
+          VITE_APP_FIREBASE_CONFIG: ${{ secrets.VITE_APP_FIREBASE_CONFIG }}
+          VITE_APP_GOOGLE_CLIENT_NAME: ${{ secrets.VITE_APP_GOOGLE_CLIENT_NAME }}
+          VITE_APP_PLUS_EXPORT_PUBLIC_KEY: ${{ secrets.VITE_APP_PLUS_EXPORT_PUBLIC_KEY }}
 
   deploy:
     runs-on: ubuntu-latest
