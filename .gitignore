@@ -4,6 +4,9 @@
 .env.production.local
 .env.test.local
 .envrc
+# Real secret values belong in .env.*.local (gitignored above).
+# .env.production and .env.development only contain public URLs and flags.
+# Keep them tracked so devs have a reference template.
 .eslintcache
 .history
 .idea
