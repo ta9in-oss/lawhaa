@@ -150,6 +150,7 @@ import "./index.scss";
 import { ExcalidrawPlusPromoBanner } from "./components/ExcalidrawPlusPromoBanner";
 import { AppSidebar } from "./components/AppSidebar";
 import BoardsDashboard from "./components/BoardsDashboard";
+import LandingPage from "./components/LandingPage";
 import { getLocalBoard, saveLocalBoard } from "./data/localBoards";
 import {
   INSTANTDB_CONFIGURED,
@@ -1465,12 +1466,18 @@ const ExcalidrawApp = () => {
   }
 
   // ── Boards routing ────────────────────────────────────────────────────────
-  const isDashboard =
-    currentHash === "#boards" || currentHash === "" || currentHash === "#";
+  const isRoot = currentHash === "" || currentHash === "#";
+  const isDashboard = currentHash === "#boards";
   const boardMatch = currentHash.match(/^#board=([\w-]+)$/);
   const activeBoardId = boardMatch ? boardMatch[1] : null;
 
-  if (isDashboard && !boardMatch) {
+  // Root is a public, unauthenticated landing page (required for Google
+  // OAuth branding verification — the app's homepage cannot sit behind login).
+  if (isRoot) {
+    return <LandingPage />;
+  }
+
+  if (isDashboard) {
     return <BoardsDashboard />;
   }
 
