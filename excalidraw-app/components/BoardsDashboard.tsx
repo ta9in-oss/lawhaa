@@ -261,7 +261,13 @@ const LoginScreen: React.FC = () => {
     <div className="boards-dashboard">
       <header className="boards-dashboard__header">
         <div className="boards-dashboard__logo">
-          <span className="boards-dashboard__logo-icon">{pencilIcon}</span>
+          <img
+            className="boards-dashboard__logo-icon"
+            src="/logo.png"
+            alt="Lawhaa"
+            width={28}
+            height={28}
+          />
           <span className="boards-dashboard__logo-text">Lawhaa</span>
         </div>
       </header>
@@ -412,7 +418,13 @@ const BoardsDashboardInner: React.FC<BoardsDashboardInnerProps> = ({
       {/* Header */}
       <header className="boards-dashboard__header">
         <div className="boards-dashboard__logo">
-          <span className="boards-dashboard__logo-icon">{pencilIcon}</span>
+          <img
+            className="boards-dashboard__logo-icon"
+            src="/logo.png"
+            alt="Lawhaa"
+            width={28}
+            height={28}
+          />
           <span className="boards-dashboard__logo-text">Lawhaa</span>
         </div>
 

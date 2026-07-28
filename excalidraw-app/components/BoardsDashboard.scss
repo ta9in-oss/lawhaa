@@ -30,15 +30,10 @@
 }
 
 .boards-dashboard__logo-icon {
-  display: flex;
-  align-items: center;
-
-  svg {
-    width: 28px;
-    height: 28px;
-    color: var(--color-primary, #5b57d1);
-    fill: var(--color-primary, #5b57d1);
-  }
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  display: block;
 }
 
 .boards-dashboard__logo-text {

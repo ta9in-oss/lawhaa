@@ -1,5 +1,4 @@
 import React from "react";
-import { pencilIcon } from "@excalidraw/excalidraw/components/icons";
 import { signInWithGoogle } from "../data/instantdb";
 import "./LandingPage.scss";
 
@@ -12,7 +11,13 @@ const LandingPage: React.FC = () => {
     <div className="landing-page">
       <header className="landing-page__header">
         <div className="landing-page__logo">
-          <span className="landing-page__logo-icon">{pencilIcon}</span>
+          <img
+            className="landing-page__logo-icon"
+            src="/logo.png"
+            alt="Lawhaa"
+            width={28}
+            height={28}
+          />
           <span className="landing-page__logo-text">Lawhaa</span>
         </div>
       </header>
