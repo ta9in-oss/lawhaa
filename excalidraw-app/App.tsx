@@ -449,7 +449,7 @@ const ExcalidrawWrapper = ({
   const boardSceneRef = useRef(boardScene);
   boardSceneRef.current = boardScene;
 
-  // Board auto-save debounced (saves every 3s after last content change)
+  // Board auto-save debounced (saves 400ms after last content change)
   const saveBoardDebounced = useCallback(
     debounce(
       (boardId: string, elementsJSON: string, onSaved: () => void) => {
@@ -470,7 +470,7 @@ const ExcalidrawWrapper = ({
           onDone();
         }
       },
-      3000,
+      400,
     ),
     [],
   );
