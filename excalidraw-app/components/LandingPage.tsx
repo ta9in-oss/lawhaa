@@ -23,7 +23,8 @@ const LandingPage: React.FC = () => {
       </header>
 
       <main className="landing-page__hero">
-        <h1 className="landing-page__title">Whiteboard, simplified.</h1>
+        <h1 className="landing-page__title">Lawhaa</h1>
+        <p className="landing-page__tagline">Whiteboard, simplified.</p>
         <p className="landing-page__subtitle">
           Lawhaa is a collaborative whiteboard app for sketching diagrams,
           wireframes, notes, and ideas on an infinite canvas with a
