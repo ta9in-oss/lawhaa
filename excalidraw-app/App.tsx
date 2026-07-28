@@ -1461,6 +1461,18 @@ const ExcalidrawApp = () => {
     return () => window.removeEventListener("hashchange", onHashChange);
   }, []);
 
+  // InstantDB's Google OAuth redirects back to whatever URL was current when
+  // sign-in was triggered (typically the root landing page), appending
+  // `?code=...&_instant_oauth_redirect=true`. Once that completes, send the
+  // user to the boards dashboard instead of leaving them on the landing page.
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("_instant_oauth_redirect") === "true") {
+      window.history.replaceState(null, "", window.location.pathname);
+      window.location.hash = "#boards";
+    }
+  }, []);
+
   if (isCloudExportWindow) {
     return <ExcalidrawPlusIframeExport />;
   }
