@@ -20,8 +20,11 @@ const LandingPage: React.FC = () => {
       <main className="landing-page__hero">
         <h1 className="landing-page__title">Whiteboard, simplified.</h1>
         <p className="landing-page__subtitle">
-          Sketch, diagram, and collaborate on an infinite canvas. No sign-up
-          required to start.
+          Lawhaa is a collaborative whiteboard app for sketching diagrams,
+          wireframes, notes, and ideas on an infinite canvas with a
+          hand-drawn feel. Draw instantly in your browser — no account
+          needed. Sign in with Google to save your boards and sync them
+          across devices.
         </p>
 
         <div className="landing-page__actions">
@@ -50,6 +53,13 @@ const LandingPage: React.FC = () => {
             Sign in with Google
           </button>
         </div>
+
+        <ul className="landing-page__features">
+          <li>Infinite canvas for sketches, diagrams, and wireframes</li>
+          <li>Hand-drawn style shapes, arrows, and text</li>
+          <li>Save and sync boards to your account with Google sign-in</li>
+          <li>Share a board with a link, no account needed to view</li>
+        </ul>
       </main>
 
       <footer className="landing-page__footer">

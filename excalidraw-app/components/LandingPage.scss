@@ -68,6 +68,25 @@
   gap: 12px;
   flex-wrap: wrap;
   justify-content: center;
+  margin-bottom: 40px;
+}
+
+.landing-page__features {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  color: var(--color-text-secondary, #666);
+  font-size: 0.95rem;
+  text-align: left;
+
+  li::before {
+    content: "✓ ";
+    color: var(--color-primary, #5b57d1);
+    font-weight: 700;
+  }
 }
 
 .landing-page__footer {
