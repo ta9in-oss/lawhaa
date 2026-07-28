@@ -209,9 +209,25 @@
   <body>
     <noscript> You need to enable JavaScript to run this app. </noscript>
     <header>
-      <h1 class="visually-hidden">Excalidraw</h1>
+      <h1 class="visually-hidden">Lawhaa</h1>
     </header>
-    <div id="root"></div>
+    <!--
+      Static fallback content: visible to any crawler/reviewer that doesn't
+      execute JavaScript (e.g. Google OAuth branding verification). React
+      replaces this via createRoot on mount for real users.
+    -->
+    <div id="root">
+      <main style="max-width: 640px; margin: 80px auto; padding: 0 20px; font-family: system-ui, -apple-system, sans-serif; text-align: center;">
+        <h1 style="font-size: 2rem; margin-bottom: 12px;">Lawhaa</h1>
+        <p style="font-size: 1.05rem; color: #555; line-height: 1.6;">
+          Lawhaa is a collaborative whiteboard app for sketching diagrams,
+          wireframes, notes, and ideas on an infinite canvas with a
+          hand-drawn feel. Draw instantly in your browser — no account
+          needed. Sign in with Google to save your boards and sync them
+          across devices.
+        </p>
+      </main>
+    </div>
     <script type="module" src="index.tsx"></script>
     <% if (typeof PROD != 'undefined' && PROD == true) { %>
     <!-- 100% privacy friendly analytics -->
