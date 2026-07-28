@@ -1468,7 +1468,10 @@ const ExcalidrawApp = () => {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     if (params.get("_instant_oauth_redirect") === "true") {
-      window.history.replaceState(null, "", window.location.pathname);
+      // Keep ?code=... in the URL — InstantDB's useAuth() hook (mounted
+      // once we land on #boards) still needs to read it to complete the
+      // token exchange. Stripping it here raced that exchange and made
+      // the dashboard briefly render signed-out.
       window.location.hash = "#boards";
     }
   }, []);
